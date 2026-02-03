@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>อสม. ออนไลน์</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8f9fa; -webkit-user-select: none; user-select: none; }
+        
+        /* Typography & Navbar */
+        .navbar-brand { display: flex; flex-direction: column; justify-content: center; }
+        .navbar-brand .main-text { font-size: 1.1rem; font-weight: bold; line-height: 1.2; margin-bottom: 4px; white-space: normal; word-wrap: break-word; }
+        .navbar-brand .sub-text { font-size: 0.65rem; opacity: 0.9; font-weight: normal; line-height: 1.2; white-space: normal; }
+
+        .hero { background: linear-gradient(135deg, #047a48 0%, #0ebb76 100%); color: white; padding: 25px 15px; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px; }
+        .hero h1 { font-size: 1.4rem; font-weight: bold; }
+        
+        /* Cards */
+        .menu-card { border: none; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: 0.2s; cursor: pointer; background: white; display: flex; flex-direction: column; height: 100%; }
+        .menu-card:active { transform: scale(0.98); }
+        .menu-card img { height: 160px; object-fit: cover; width: 100%; }
+        .menu-card .card-body { padding: 12px; flex-grow: 1; }
+        
+        .news-item { background: white; border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 4px solid #198754; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .news-item:hover { background-color: #f1f3f5; }
+        .news-title { font-weight: 600; font-size: 1rem; color: #333; margin: 2px 0; white-space: normal; word-wrap: break-word; }
+        
+        /* Q&A Section */
+        .qa-section { max-width: 600px; margin: 0 auto; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        .qa-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-top: 20px; }
+        .qa-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .qa-header h6 { margin: 0; font-weight: bold; color: #0d6efd; font-size: 0.9rem; }
+        
+        .topic-card { border-bottom: 1px solid #eee; padding: 12px 0; cursor: pointer; }
+        .topic-card:last-child { border-bottom: none; }
+        .topic-title { font-weight: bold; font-size: 1rem; color: #333; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .topic-meta { font-size: 0.75rem; color: #888; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Thread View (Chat) */
+        .thread-container { max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
+        .question-box { background: #e7f1ff; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #cfe2ff; position: relative; }
+        .answer-box { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 3px solid #0d6efd; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; }
+        
+        .chat-name { font-weight: bold; color: #0d6efd; font-size: 0.9rem; cursor: pointer; text-decoration: none; transition: 0.2s; }
+        .chat-name:hover { text-decoration: underline; color: #0a58ca; }
+        .chat-name.admin { color: #198754; }
+        .chat-date { font-size: 0.75rem; color: #999; margin-left: 5px; }
+        .reply-tag-btn { font-size: 0.7rem; background: #e9ecef; padding: 1px 6px; border-radius: 10px; margin-left: 5px; color: #666; cursor: pointer; }
+
+        /* Views Management */
+        .app-view { display: none; }
+        
+        /* Navigation Buttons */
+        .top-nav-bar { display: flex; align-items: center; margin-bottom: 15px; padding-top: 10px; }
+        .back-btn-pill { 
+            background: white; border: 1px solid #ddd; color: #555; 
+            border-radius: 30px; padding: 6px 15px; font-size: 0.85rem; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 5px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .back-btn-pill:active { transform: scale(0.95); background: #f8f9fa; }
+
+        /* Media & Content */
+        .detail-content { font-size: 1rem; line-height: 1.6; color: #333; }
+        .detail-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin: 15px 0; background: #000; } /* 16:9 */
+        .video-container-vertical { position: relative; padding-bottom: 177.77%; height: 0; overflow: hidden; border-radius: 8px; margin: 15px auto; background: #000; width: 80%; } /* 9:16 Shorts */
+        .video-container iframe, .video-container-vertical iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .detail-gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
+        @media(min-width: 768px) { .detail-gallery-grid { grid-template-columns: repeat(4, 1fr); } }
+        .detail-gallery-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; cursor: pointer; transition:0.2s; background:#eee; }
+        .detail-gallery-img:hover { transform: scale(1.02); }
+
+        /* Utilities */
+        .btn-tiny { font-size: 0.7rem; padding: 2px 8px; border-radius: 15px; }
+        .admin-zone { display: none; background: #fff8e1; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed #ffc107; }
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; color: white; text-align: center; padding-top: 30vh; }
+        .detail-image-wrapper { position: relative; background-color: #f8f9fa; text-align:center; padding-top: 40px; padding-bottom: 10px; }
+        .floating-back-btn { position: absolute; top: 10px; left: 10px; z-index: 10; background-color: rgba(255, 255, 255, 0.3); backdrop-filter: blur(2px); border: 1px solid rgba(255,255,255,0.4); border-radius: 30px; padding: 2px 10px; font-size: 0.7rem; color: #333; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .floating-back-btn:hover { background-color: rgba(255, 255, 255, 0.8); }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div id="loadingOverlay" class="loading-overlay"><div class="spinner-border text-light"></div><p class="mt-2 small">กำลังโหลด...</p></div>
+
+    <nav class="navbar navbar-dark bg-success shadow-sm sticky-top py-2">
+        <div class="container align-items-center">
+            <a class="navbar-brand" href="javascript:void(0)" onclick="goHome()">
+                <span class="main-text" id="nav-main-text"><i class="bi bi-heart-pulse-fill"></i> อสม.หมู่3ชุมชนเจริญราษฎร์</span>
+                <span class="sub-text" id="nav-sub-text">เทศบาลตำบลสุวรรณภูมิ อำเภอสุวรรณภูมิ จ.ร้อยเอ็ด</span>
+            </a>
+            <div class="ms-auto d-flex gap-1">
+                <button class="btn btn-outline-light btn-tiny" onclick="openLoginModal()" id="btnLoginNav">เข้าสู่ระบบ</button>
+                <div id="btnLogoutNav" class="d-none d-flex align-items-center gap-1">
+                    <span id="adminNameDisplay" class="text-white small" style="font-size: 0.7rem;"></span>
+                    <button class="btn btn-warning btn-tiny" onclick="logout()">ออก</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div id="adminPanel" class="admin-zone mt-3">
+            <h6 class="fw-bold mb-2">🛠️ เมนูจัดการ <span id="roleDisplay" class="badge bg-secondary"></span></h6>
+            <ul class="nav nav-pills nav-fill mb-3" style="font-size: 0.85rem;">
+                <li class="nav-item"><button class="nav-link active py-1" data-bs-toggle="tab" data-bs-target="#tab-add-news">โพสต์งาน</button></li>
+                <li class="nav-item" id="menuMods"><button class="nav-link py-1" data-bs-toggle="tab" data-bs-target="#tab-mods" onclick="loadMods()">ผู้ช่วย</button></li>
+                <li class="nav-item" id="menuSettings"><button class="nav-link py-1" data-bs-toggle="tab" data-bs-target="#tab-settings">เปลี่ยนรหัส</button></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="tab-add-news">
+                    <form id="addNewsForm">
+                        <div class="row g-2">
+                            <div class="col-6"><input type="date" class="form-control form-control-sm" id="newsDate" required></div>
+                            <div class="col-6">
+                                <select class="form-select form-select-sm" id="newsCategory" required>
+                                    <option value="" selected disabled>เลือกหมวด...</option>
+                                    <option value="ข่าวประชาสัมพันธ์">แจ้งข่าว</option>
+                                    <option value="รณรงค์ลูกน้ำยุงลาย">ยุงลาย</option>
+                                    <option value="เยี่ยมบ้านผู้สูงอายุ">ผู้สูงอายุ</option>
+                                    <option value="กิจกรรมช่วยเหลือชุมชน">ช่วยเหลือ</option>
+                                    <option value="ประชุมประจำเดือน">ประชุม</option>
+                                </select>
+                            </div>
+                            <div class="col-12"><input type="text" class="form-control form-control-sm" id="newsTitle" placeholder="หัวข้อ..." required></div>
+                            <div class="col-12"><textarea class="form-control form-control-sm" id="newsDetail" rows="2" placeholder="รายละเอียด..."></textarea></div>
+                            <div class="col-12"><input type="file" class="form-control form-control-sm" id="newsFiles" multiple accept="image/*"></div>
+                            <div class="col-12"><button type="submit" class="btn btn-success btn-sm w-100">บันทึก</button></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="tab-mods">
+                    <form id="addModForm" class="mb-3 border-bottom pb-3">
+                        <div class="input-group input-group-sm mb-1">
+                            <input type="text" class="form-control" id="modUser" placeholder="User" required>
+                            <input type="text" class="form-control" id="modPass" placeholder="Pass" required>
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" id="modName" placeholder="ชื่อเรียก" required>
+                            <button class="btn btn-primary" type="submit">สร้าง</button>
+                        </div>
+                    </form>
+                    <div id="modList" class="small">กำลังโหลด...</div>
+                </div>
+                <div class="tab-pane fade" id="tab-settings">
+                    <div class="input-group input-group-sm"><input type="text" class="form-control" id="newPassword" placeholder="รหัสผ่าน Admin ใหม่"><button class="btn btn-warning" onclick="changePassword()">บันทึก</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="home-view" class="app-view">
+            <div class="hero mt-3">
+                <h1>ชุมชนสุขภาพดี</h1>
+                <p>ศูนย์รวมข้อมูลข่าวสารและกิจกรรม อสม.</p>
+            </div>
+
+            <h6 class="fw-bold text-secondary mb-3 ps-1 border-start border-4 border-success">&nbsp;ข่าวประชาสัมพันธ์ล่าสุด</h6>
+            <div id="news-board-container" class="mb-4">
+                <div class="text-center text-muted small py-3">
+                    <div class="spinner-border spinner-border-sm text-secondary"></div> กำลังโหลด...
+                </div>
+            </div>
+
+            <h6 class="fw-bold text-secondary mb-3 ps-1 border-start border-4 border-primary">&nbsp;เลือกหมวดกิจกรรม</h6>
+            
+            <div class="row g-3">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="menu-card h-100" onclick="updateHash('category', 'รณรงค์ลูกน้ำยุงลาย')">
+                        <img src="https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=500&auto=format&fit=crop&q=60" alt="ยุงลาย" onerror="this.src='https://via.placeholder.com/300x180?text=Mosquito'">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-danger mb-2">รณรงค์ลูกน้ำยุงลาย</h6>
+                            <p class="text-secondary m-0" style="font-size: 0.8rem; line-height: 1.4;">อันตรายจากยุงลาย! เป็นพาหะไข้เลือดออก ร่วมมือกันกำจัดแหล่งเพาะพันธุ์ "3 เก็บ ป้องกัน 3 โรค"</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="menu-card h-100" onclick="updateHash('category', 'เยี่ยมบ้านผู้สูงอายุ')">
+                        <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?w=400" alt="ผู้สูงอายุ">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-dark mb-2">เยี่ยมบ้านผู้สูงอายุ</h6>
+                            <p class="text-secondary m-0" style="font-size: 0.8rem; line-height: 1.4;">อสม. ลงพื้นที่เยี่ยมให้กำลังใจ ตรวจวัดความดัน และดูแลสุขภาพเบื้องต้นให้กับผู้สูงอายุ</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="menu-card h-100" onclick="updateHash('category', 'กิจกรรมช่วยเหลือชุมชน')">
+                        <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=400" alt="ช่วยเหลือ">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-primary mb-2">กิจกรรมช่วยเหลือชุมชน</h6>
+                            <p class="text-secondary m-0" style="font-size: 0.8rem; line-height: 1.4;">ร่วมแรงร่วมใจพัฒนาหมู่บ้าน จิตอาสาเพื่อสาธารณประโยชน์ และช่วยเหลือผู้ประสบภัย</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="menu-card h-100" onclick="updateHash('category', 'ประชุมประจำเดือน')">
+                        <img src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=400" alt="ประชุม">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-dark mb-2">ประชุมประจำเดือน</h6>
+                            <p class="text-secondary m-0" style="font-size: 0.8rem; line-height: 1.4;">ประชุมวางแผนการดำเนินงาน รับมอบนโยบาย และแลกเปลี่ยนข้อมูลเพื่อพัฒนาสุขภาพชุมชน</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="qa-section">
+                <div class="qa-card">
+                    <div class="qa-header">
+                        <h6><i class="bi bi-chat-dots-fill"></i> กระดานถาม-ตอบ</h6>
+                        <button class="btn btn-outline-primary btn-sm rounded-pill py-0 px-2" style="font-size: 0.75rem;" onclick="openQuestionModal()">เริ่มหัวข้อใหม่</button>
+                    </div>
+                    <div id="commentArea" class="small">กำลังโหลด...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="category-view" class="app-view">
+            <div class="top-nav-bar">
+                <button class="back-btn-pill" onclick="goHome()">
+                    <i class="bi bi-chevron-left"></i> กลับหน้าหลัก
+                </button>
+            </div>
+            <h5 id="category-title" class="fw-bold text-success mb-3"></h5> 
+            <div id="category-content"></div>
+        </div>
+
+        <div id="detail-view" class="app-view">
+            <div class="top-nav-bar">
+                <button class="back-btn-pill" onclick="backToCategory()">
+                    <i class="bi bi-chevron-left"></i> ย้อนกลับ
+                </button>
+            </div>
+            
+            <div class="card border-0 shadow-sm mb-4 bg-white rounded-3">
+                <div class="card-body p-4">
+                    <h4 id="detail-title" class="fw-bold text-dark mb-2"></h4>
+                    <p class="text-muted small mb-3"><i class="bi bi-calendar3"></i> <span id="detail-date"></span></p>
+                    <hr>
+                    <div id="detail-desc" class="detail-content" style="white-space: pre-wrap;"></div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm p-3 mb-5 bg-white rounded-3">
+                <h6 class="fw-bold text-secondary border-start border-4 border-success ps-2 mb-3">📸 รูปภาพทั้งหมดในกิจกรรมนี้</h6>
+                <div id="detail-gallery-container">
+                    <div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm"></div> กำลังโหลดรูปภาพ...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="thread-view" class="app-view">
+            <div class="top-nav-bar">
+                <button class="back-btn-pill" onclick="goHome()">
+                    <i class="bi bi-chevron-left"></i> กลับกระดานถาม-ตอบ
+                </button>
+            </div>
+            <div class="thread-container">
+                <div id="thread-content"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="loginModal" tabindex="-1"><div class="modal-dialog modal-sm modal-dialog-centered"><div class="modal-content"><div class="modal-body p-4"><h6 class="fw-bold text-center mb-3">เข้าสู่ระบบ</h6><input type="text" id="loginUser" class="form-control form-control-sm mb-2 text-center" placeholder="ชื่อผู้ใช้"><input type="password" id="loginPass" class="form-control form-control-sm mb-2 text-center" placeholder="รหัสผ่าน"><button class="btn btn-success btn-sm w-100" onclick="doLogin()">ยืนยัน</button></div></div></div></div>
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1"><div class="modal-dialog modal-fullscreen"><div class="modal-content bg-black"><div class="modal-header border-0 bg-transparent p-2 position-absolute top-0 end-0 z-3"><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-0 d-flex align-items-center justify-content-center"><img id="previewImageFull" src="" style="max-width:100%; max-height:100vh;"></div></div></div></div>
+    
+    <div class="modal fade" id="replyModal" tabindex="-1"><div class="modal-dialog modal-sm modal-dialog-centered"><div class="modal-content"><div class="modal-body">
+        <h6 class="fw-bold mb-2 text-primary"><i class="bi bi-chat-dots"></i> ตอบกลับ</h6>
+        <input type="hidden" id="replyIndex">
+        <div id="replyNameContainer"><input type="text" class="form-control form-control-sm mb-2" id="replyName" placeholder="ชื่อของคุณ" required></div>
+        <textarea class="form-control form-control-sm mb-2" id="replyText" rows="3" placeholder="ข้อความ..." required></textarea>
+        <button class="btn btn-primary btn-sm w-100" onclick="sendReply()">ส่งข้อความ</button>
+    </div></div></div></div>
+
+    <div class="modal fade" id="questionModal" tabindex="-1"><div class="modal-dialog modal-sm modal-dialog-centered"><div class="modal-content"><div class="modal-body"><form id="osmForm"><input type="text" class="form-control form-control-sm mb-2" id="userName" placeholder="ชื่อของคุณ" required><textarea class="form-control form-control-sm mb-2" id="userMsg" rows="3" placeholder="พิมพ์คำถาม/แนะนำ..." required></textarea><button class="btn btn-primary btn-sm w-100" type="submit">ตั้งหัวข้อใหม่</button></form></div></div></div></div>
+    <div class="modal fade" id="editModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-warning"><div class="modal-header bg-warning py-2"><h6 class="modal-title fw-bold text-dark"><i class="bi bi-pencil-square"></i> แก้ไขข้อมูล</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="editForm"><input type="hidden" id="editIndex"><div class="mb-2"><label class="small">วันที่</label><input type="date" class="form-control form-control-sm" id="editDate" required></div><div class="mb-2"><label class="small">หมวดหมู่</label><select class="form-select form-select-sm" id="editCategory" required><option value="ข่าวประชาสัมพันธ์">แจ้งข่าว</option><option value="รณรงค์ลูกน้ำยุงลาย">ยุงลาย</option><option value="เยี่ยมบ้านผู้สูงอายุ">ผู้สูงอายุ</option><option value="กิจกรรมช่วยเหลือชุมชน">ช่วยเหลือ</option><option value="ประชุมประจำเดือน">ประชุม</option></select></div><div class="mb-2"><label class="small">หัวข้อ</label><input type="text" class="form-control form-control-sm" id="editTitle" required></div><div class="mb-2"><label class="small">รายละเอียด</label><textarea class="form-control form-control-sm" id="editDetail" rows="3"></textarea></div><div class="mb-2"><label class="small text-primary fw-bold">+ อัปรูปเพิ่ม (ถ้ามี)</label><input type="file" class="form-control form-control-sm" id="editFiles" multiple accept="image/*"></div><button type="submit" class="btn btn-warning btn-sm w-100">บันทึกการแก้ไข</button></form></div></div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ***************************************************************
+        // ⚠️⚠️⚠️ ใส่ลิงก์ Apps Script ของคุณตรงนี้ ⚠️⚠️⚠️
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlH_GyFa1zL9mkNPy-p20yNJXHyDi9SbV8_3mpq1jIMSfs3_wYiZz14SmV9--RzxZh/exec'; 
+        // ***************************************************************
+        
+        let userRole = null; 
+        let userName = '';
+        let allNewsData = [];
+        let idleTimer;
+        let currentCategory = '';
+        let isNavigatingByHistory = false;
+        
+        let currentThreadIndex = null;
+        let currentThreadUser = '';
+        
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        const replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
+        const questionModal = new bootstrap.Modal(document.getElementById('questionModal'));
+        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+        const imagePreviewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+
+        function stopVideos() {
+            document.getElementById('detail-desc').innerHTML = '';
+            document.getElementById('detail-gallery-container').innerHTML = '';
+        }
+
+        function switchScreen(screenName) {
+            stopVideos();
+            document.querySelectorAll('.app-view').forEach(view => {
+                view.style.display = 'none';
+            });
+
+            if (screenName === 'home') {
+                resetNavbar();
+                document.getElementById('home-view').style.display = 'block';
+            } else if (screenName === 'category') {
+                resetNavbar();
+                document.getElementById('category-view').style.display = 'block';
+            } else if (screenName === 'detail') {
+                document.getElementById('detail-view').style.display = 'block';
+            } else if (screenName === 'thread') {
+                document.getElementById('thread-view').style.display = 'block';
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function updateHash(view, param) {
+            if (view === 'home') window.location.hash = '';
+            else if (view === 'category') window.location.hash = `category=${encodeURIComponent(param)}`;
+            else if (view === 'detail') window.location.hash = `detail=${param}`;
+            else if (view === 'thread') window.location.hash = `thread=${param}`;
+        }
+
+        function checkHashAndNavigate() {
+            const hash = window.location.hash.substring(1);
+            if (allNewsData.length === 0 && (!allNewsData.news && !allNewsData.comments)) return; 
+
+            if (hash.startsWith('category=')) {
+                const cat = decodeURIComponent(hash.split('=')[1]);
+                openCategory(cat, false);
+            } else if (hash.startsWith('detail=')) {
+                const index = hash.split('=')[1];
+                openNewsDetailFull(index, false);
+            } else if (hash.startsWith('thread=')) {
+                const index = hash.split('=')[1];
+                openThread(index, false);
+            } else {
+                showHome(false);
+            }
+        }
+
+        window.onhashchange = function() { checkHashAndNavigate(); };
+
+        function goHome() { updateHash('home'); }
+        function goBack() { window.history.back(); }
+        function showHome(updateUrl = true) { 
+            switchScreen('home');
+            if(updateUrl) updateHash('home');
+        }
+        function backToCategory() { window.history.back(); }
+
+        function setNavbarTitle(title) {
+            document.getElementById('nav-main-text').innerText = title;
+            document.getElementById('nav-sub-text').innerText = "รายละเอียดกิจกรรม";
+        }
+
+        function resetNavbar() {
+            document.getElementById('nav-main-text').innerHTML = '<i class="bi bi-heart-pulse-fill"></i> อสม.หมู่3ชุมชนเจริญราษฎร์';
+            document.getElementById('nav-sub-text').innerText = "เทศบาลตำบลสุวรรณภูมิ อำเภอสุวรรณภูมิ จ.ร้อยเอ็ด";
+        }
+
+        // --- Q&A Logic (กดชื่อตอบกลับ) ---
+        function openThread(index, updateUrl = true) {
+            let item;
+            if (allNewsData.comments) item = allNewsData.comments.find(d => d.index == index);
+            else if (Array.isArray(allNewsData)) item = allNewsData.comments.find(d => d.index == index);
+            
+            if(!item) { showHome(); return; }
+
+            currentThreadIndex = index;
+            currentThreadUser = item.col2;
+
+            // ✅ Render คำถาม (กดชื่อตอบกลับ)
+            let html = `
+                <div class="question-box">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="chat-name" onclick="openReplyModal(${index}, '${item.col2}')" style="font-size:1rem;">${item.col2} <span class="reply-tag-btn">ตอบกลับ</span></span>
+                            <span class="chat-date">${new Date(item.col1).toLocaleDateString('th-TH')}</span>
+                        </div>
+                    </div>
+                    <div class="text-dark" style="white-space: pre-wrap; word-wrap: break-word; font-size:1.1rem; font-weight:500;">${item.col3}</div>
+                </div>
+                
+                <h6 class="text-muted small ms-2 mb-3">ความคิดเห็น</h6>
+            `;
+
+            if(item.col4) {
+                let replyLines = item.col4.split('\n');
+                replyLines.forEach(line => {
+                    if(line.trim()) {
+                        let parts = line.replace('➥ ', '').split(']: ');
+                        let rName = parts[0] ? parts[0].replace('[', '') : 'Admin';
+                        let rMsg = parts[1] || '';
+                        let nameClass = (rName === 'Admin' || rName === 'Super Admin' || rName === 'admin') ? 'chat-name admin' : 'chat-name';
+
+                        // ✅ Render คำตอบ (กดชื่อตอบกลับ)
+                        html += `
+                        <div class="answer-box">
+                            <div class="mb-1">
+                                <span class="${nameClass}" onclick="openReplyModal(${index}, '${rName}')">${rName} <span class="reply-tag-btn">ตอบกลับ</span></span>
+                            </div>
+                            <div class="text-dark" style="word-wrap: break-word;">${rMsg}</div>
+                        </div>`;
+                    }
+                });
+            } else {
+                html += `<div class="text-center text-muted my-5 py-3" style="background:#f8f9fa; border-radius:10px;">ยังไม่มีการตอบกลับ<br>มาเป็นคนแรกที่ตอบคำถามนี้กันเถอะ</div>`;
+            }
+
+            document.getElementById('thread-content').innerHTML = html;
+            switchScreen('thread');
+            if(updateUrl) updateHash('thread', index);
+        }
+
+        function renderComments(data) { 
+            let html = ''; 
+            if(data && data.length > 0) {
+                data.forEach(item => { 
+                    let replyCount = item.col4 ? item.col4.split('\n').filter(l => l.trim()).length : 0;
+                    let deleteBtn = userRole ? `<button class="btn btn-sm text-danger btn-tiny position-absolute top-0 end-0 m-2" onclick="event.stopPropagation(); deleteItem('comment', ${item.index})">&times;</button>` : ''; 
+                    
+                    html += `
+                    <div class="topic-card" onclick="openThread(${item.index})">
+                        ${deleteBtn}
+                        <div class="topic-title">${item.col3}</div>
+                        <div class="topic-meta">
+                            <span><i class="bi bi-person"></i> ${item.col2} &bull; ${new Date(item.col1).toLocaleDateString('th-TH')}</span>
+                            <span><i class="bi bi-chat-dots-fill text-primary"></i> ${replyCount}</span>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html = '<div class="text-center text-muted py-3">ยังไม่มีคำถาม</div>';
+            }
+            document.getElementById('commentArea').innerHTML = html; 
+        }
+
+        function openCategory(categoryName, updateUrl = true) {
+            currentCategory = categoryName;
+            document.getElementById('category-title').innerText = categoryName;
+            let filteredData = allNewsData.news.filter(item => item.category === categoryName);
+            renderCategoryContent(filteredData);
+            
+            switchScreen('category');
+            if(updateUrl) updateHash('category', categoryName);
+        }
+
+        function openNewsDetailFull(index, updateUrl = true) {
+            let item = allNewsData.news.find(d => d.index == index);
+            if(!item) { showHome(); return; } 
+
+            setNavbarTitle(item.col2);
+            document.getElementById('detail-title').innerText = item.col2;
+            document.getElementById('detail-date').innerText = new Date(item.col1).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // ✅ ระบบวิดีโอ (อัปเกรด)
+            const shortsRegex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([\w-]{11})(?:\S+)?/g;
+            const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})(?:\S+)?/g;
+            const imgRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp))/ig;
+            const driveImgRegex = /https:\/\/drive\.google\.com\/file\/d\/([-_\w]+)\/[^\s]*/g;
+            const allowAttr = 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen';
+
+            let rawDesc = item.col4 ? item.col4.toString() : "";
+            let formattedDesc = rawDesc
+                .replace(shortsRegex, `<div class="video-container-vertical"><iframe src="https://www.youtube.com/embed/$1" ${allowAttr}></iframe></div>`)
+                .replace(ytRegex, `<div class="video-container"><iframe src="https://www.youtube.com/embed/$1" ${allowAttr}></iframe></div>`)
+                .replace(imgRegex, '<img src="$1" class="img-fluid rounded my-3 shadow-sm">')
+                .replace(driveImgRegex, '<img src="https://drive.google.com/thumbnail?sz=w1000&id=$1" class="img-fluid rounded my-3 shadow-sm">')
+                .replace(/\n/g, '<br>');
+
+            switchScreen('detail');
+            document.getElementById('detail-desc').innerHTML = formattedDesc;
+            loadGalleryToDetail(item.col5);
+            if(updateUrl) updateHash('detail', index);
+        }
+
+        function getCoverImage(category, userImage) {
+            if (userImage && userImage.trim() !== '') return userImage;
+            switch(category) {
+                case 'รณรงค์ลูกน้ำยุงลาย': return 'mosquito.jpg'; 
+                case 'เยี่ยมบ้านผู้สูงอายุ': return 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=400';
+                case 'กิจกรรมช่วยเหลือชุมชน': return 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=400';
+                case 'ประชุมประจำเดือน': return 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=400';
+                default: return 'https://via.placeholder.com/600x400?text=No+Image';
+            }
+        }
+
+        function loadAllData() {
+            fetch(SCRIPT_URL + '?action=read_all').then(res => res.json()).then(data => { 
+                showLoading(false); 
+                allNewsData = data; 
+                if(data.news) renderNewsBoard(data.news.filter(item => item.category === 'ข่าวประชาสัมพันธ์'));
+                if(data.comments) renderComments(data.comments); 
+                checkHashAndNavigate();
+            }).catch(err => { showLoading(false); console.error(err); document.getElementById('news-board-container').innerHTML = '<div class="text-center text-danger">โหลดไม่สำเร็จ <button class="btn btn-sm btn-outline-danger" onclick="loadAllData()">ลองใหม่</button></div>'; });
+        }
+
+        function renderNewsBoard(data) {
+            let html = '';
+            if(data && data.length > 0) {
+                data.forEach(item => {
+                    let actionBtns = '';
+                    if(userRole === 'admin') actionBtns = `<div class="ms-2 d-flex flex-column gap-1"><button class="btn btn-warning btn-tiny" onclick="event.stopPropagation(); openEditModal(${item.index})"><i class="bi bi-pencil"></i></button> <button class="btn btn-danger btn-tiny" onclick="event.stopPropagation(); deleteItem('news', ${item.index})"><i class="bi bi-trash"></i></button></div>`;
+                    else if(userRole === 'mod') actionBtns = `<div class="ms-2"><button class="btn btn-warning btn-tiny" onclick="event.stopPropagation(); openEditModal(${item.index})"><i class="bi bi-pencil"></i></button></div>`;
+                    html += `<div class="news-item" onclick="openNewsDetailFull('${item.index}')"><div class="d-flex justify-content-between align-items-center"><div style="flex:1;"><span class="news-date"><i class="bi bi-calendar"></i> ${new Date(item.col1).toLocaleDateString('th-TH')}</span><div class="news-title">${item.col2}</div><div class="text-primary small mt-1"><span class="fs-6">👉</span> กดเพื่อดูรายละเอียด</div></div>${actionBtns}</div></div>`;
+                });
+            } else { html = '<div class="text-center p-3 text-muted small">ยังไม่มีข้อมูล</div>'; }
+            document.getElementById('news-board-container').innerHTML = html;
+        }
+        
+        function renderCategoryContent(data) {
+            let html = '';
+            if(data && data.length > 0) {
+                data.forEach(item => {
+                    let img = getCoverImage(item.category, item.col3);
+                    let actionBtns = '';
+                    if(userRole === 'admin') actionBtns = `<div class="position-absolute top-0 end-0 m-2"><button class="btn btn-warning btn-tiny shadow" onclick="event.stopPropagation(); openEditModal(${item.index})"><i class="bi bi-pencil"></i></button> <button class="btn btn-danger btn-tiny shadow" onclick="event.stopPropagation(); deleteItem('news', ${item.index})"><i class="bi bi-trash"></i></button></div>`;
+                    else if(userRole === 'mod') actionBtns = `<div class="position-absolute top-0 end-0 m-2"><button class="btn btn-warning btn-tiny shadow" onclick="event.stopPropagation(); openEditModal(${item.index})"><i class="bi bi-pencil"></i></button></div>`;
+                    html += `<div class="col-12 col-md-4 col-lg-3"><div class="card h-100 border-0 shadow-sm" style="cursor:pointer;" onclick="openNewsDetailFull('${item.index}')"><div style="height:180px; overflow:hidden; position:relative; background:#f0f0f0;"><img src="${img}" class="w-100 h-100" style="object-fit:cover;" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image';">${actionBtns}</div><div class="p-3"><small class="text-success fw-bold" style="font-size:0.75rem;">${new Date(item.col1).toLocaleDateString('th-TH')}</small><div class="fw-bold text-dark mt-1" style="font-size:1rem; white-space: normal; word-wrap: break-word;">${item.col2}</div></div></div></div>`;
+                });
+                html = `<div class="row g-3">${html}</div>`;
+            } else { html = '<div class="text-center text-muted py-5 small">ไม่มีกิจกรรมในหมวดนี้</div>'; }
+            document.getElementById('category-content').innerHTML = html;
+        }
+
+        function loadGalleryToDetail(folderUrl) {
+            let container = document.getElementById('detail-gallery-container');
+            container.innerHTML = '<div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm"></div> กำลังโหลดรูปภาพ...</div>';
+            if(!folderUrl) { container.innerHTML = '<div class="text-center py-4 text-muted small">ไม่มีรูปภาพเพิ่มเติม</div>'; return; }
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({action:'get_gallery', folderUrl:folderUrl}) }).then(res => res.json()).then(data => { let html = ''; if(data.length > 0) { html = '<div class="detail-gallery-grid">'; data.forEach(f => { if(f.type=='img') { html += `<img src="${f.url}" class="detail-gallery-img" onclick="showPreview('${f.url}')">`; } else { html += `<div class="p-2 bg-dark text-white rounded text-center d-flex align-items-center justify-content-center" style="height:150px;"><a href="${f.url}" target="_blank" class="text-white text-decoration-none">▶ วิดีโอ</a></div>`; } }); html += '</div>'; } else { html = '<div class="text-center py-4 text-muted small">ไม่พบรูปภาพในอัลบั้ม</div>'; } container.innerHTML = html; }).catch(err => { container.innerHTML = '<div class="text-center text-danger small">โหลดรูปภาพไม่สำเร็จ</div>'; });
+        }
+        function showPreview(url) { document.getElementById('previewImageFull').src = url; imagePreviewModal.show(); }
+        function openLoginModal() { loginModal.show(); }
+        function logout(alertUser = true) { userRole = null; userName = ''; localStorage.removeItem('adminSession'); clearTimeout(idleTimer); updateUI(); if(alertUser) alert("ออกจากระบบแล้ว"); loadAllData(); }
+        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'block' : 'none'; }
+        function openQuestionModal() { questionModal.show(); }
+        function resetIdleTimer() { if (userRole) { clearTimeout(idleTimer); idleTimer = setTimeout(() => { alert("หมดเวลาใช้งาน"); logout(false); }, 30 * 60 * 1000); } }
+        function initIdleSystem() { window.onload = document.onmousemove = document.onclick = document.ontouchstart = resetIdleTimer; }
+        function checkSession() { const session = JSON.parse(localStorage.getItem('adminSession')); if(session) { userRole = session.role; userName = session.name; updateUI(); resetIdleTimer(); } }
+        function openReplyModal(index, tagUser) { document.getElementById('replyIndex').value = index; if (userName) { document.getElementById('replyName').value = userName; document.getElementById('replyNameContainer').style.display = 'none'; } else { document.getElementById('replyName').value = ''; document.getElementById('replyNameContainer').style.display = 'block'; } document.getElementById('replyText').value = '@' + tagUser + ' '; replyModal.show(); }
+        function sendReply() { let index = document.getElementById('replyIndex').value; let name = document.getElementById('replyName').value; let text = document.getElementById('replyText').value; if(!name || !text) { alert("กรุณาใส่ชื่อและข้อความ"); return; } showLoading(true); replyModal.hide(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reply_comment', index: index, replierName: name, replyText: text }) }).then(() => { showLoading(false); loadAllData(); 
+            setTimeout(() => { if(document.getElementById('thread-view').style.display === 'block') openThread(index, false); }, 500);
+        }); }
+        function deleteItem(type, index) { if(!confirm("ยืนยันลบ?")) return; showLoading(true); 
+            let itemToDelete;
+            if(type === 'news') itemToDelete = allNewsData.news.find(d => d.index == index);
+            else itemToDelete = allNewsData.comments.find(d => d.index == index);
+            let payload = { action: type == 'news' ? 'delete_news' : 'delete_comment', index: index }; 
+            if (type == 'news' && itemToDelete) { payload.title = itemToDelete.col2; payload.date = itemToDelete.col1; } 
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(() => { showLoading(false); loadAllData(); }); }
+        function changePassword() { let newPass = document.getElementById('newPassword').value; if(!newPass) return; showLoading(true); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'change_pass', newPass: newPass }) }).then(() => { showLoading(false); alert("เปลี่ยนรหัสสำเร็จ"); }); }
+        document.getElementById('osmForm').addEventListener('submit', function(e) { e.preventDefault(); let payload = { action: 'add_comment', name: document.getElementById('userName').value, message: document.getElementById('userMsg').value }; showLoading(true); questionModal.hide(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(() => { showLoading(false); document.getElementById('osmForm').reset(); loadAllData(); }); });
+        function updateUI() { let isAdminPanel = (userRole === 'admin' || userRole === 'mod'); document.getElementById('adminPanel').style.display = isAdminPanel ? 'block' : 'none'; document.getElementById('adminNameDisplay').innerText = userName; document.getElementById('roleDisplay').innerText = userRole === 'admin' ? 'Super Admin' : 'ผู้ช่วย'; if(userRole === 'admin') { document.getElementById('menuMods').style.display = 'block'; document.getElementById('menuSettings').style.display = 'block'; } else { document.getElementById('menuMods').style.display = 'none'; document.getElementById('menuSettings').style.display = 'none'; } if(isAdminPanel) { document.getElementById('btnLoginNav').classList.add('d-none'); document.getElementById('btnLogoutNav').classList.remove('d-none'); } else { document.getElementById('btnLoginNav').classList.remove('d-none'); document.getElementById('btnLogoutNav').classList.add('d-none'); } }
+        function loadMods() { document.getElementById('modList').innerHTML = 'กำลังโหลด...'; fetch(SCRIPT_URL + '?action=get_mods').then(res => res.json()).then(data => { let html = '<ul class="list-group">'; data.forEach((mod, idx) => { if(idx === 0) return; html += `<li class="list-group-item d-flex justify-content-between align-items-center">${mod.col3} (${mod.col1}) <button class="btn btn-danger btn-tiny" onclick="deleteMod(${mod.index})">ลบ</button></li>`; }); html += '</ul>'; document.getElementById('modList').innerHTML = html; }); }
+        document.getElementById('addModForm').addEventListener('submit', function(e) { e.preventDefault(); showLoading(true); let payload = { action: 'add_mod', user: document.getElementById('modUser').value, pass: document.getElementById('modPass').value, name: document.getElementById('modName').value }; fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(res => res.json()).then(data => { showLoading(false); if(data.result === 'success') { alert('เพิ่มผู้ช่วยสำเร็จ'); document.getElementById('addModForm').reset(); loadMods(); } else { alert('Error: ' + data.result); } }); });
+        function deleteMod(index) { if(!confirm("ต้องการลบผู้ช่วยคนนี้?")) return; fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_mod', index: index }) }).then(() => loadMods()); }
+        function openEditModal(index) { let item = allNewsData.news.find(d => d.index == index); if(!item) return; document.getElementById('editIndex').value = index; let d = new Date(item.col1); document.getElementById('editDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; document.getElementById('editCategory').value = item.category; document.getElementById('editTitle').value = item.col2; document.getElementById('editDetail').value = item.col4; document.getElementById('editFiles').value = ""; editModal.show(); }
+        document.getElementById('editForm').addEventListener('submit', function(e) { e.preventDefault(); if(!confirm("ยืนยันการแก้ไข?")) return; showLoading(true); let files = document.getElementById('editFiles').files; let filePromises = []; for (let i = 0; i < files.length; i++) { filePromises.push(new Promise((resolve) => { let reader = new FileReader(); reader.onload = (e) => resolve({ name: files[i].name, mime: files[i].type, data: e.target.result }); reader.readAsDataURL(files[i]); })); } Promise.all(filePromises).then(fileData => { let payload = { action: 'edit_news', index: document.getElementById('editIndex').value, date: document.getElementById('editDate').value, category: document.getElementById('editCategory').value, title: document.getElementById('editTitle').value, detail: document.getElementById('editDetail').value, files: fileData }; fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(res => res.json()).then(data => { showLoading(false); if (data.result === 'success') { alert("✅ แก้ไขเรียบร้อย!"); editModal.hide(); loadAllData(); } else { alert("Error: " + data.result); } }); }); });
+        document.getElementById('addNewsForm').addEventListener('submit', function(e) { e.preventDefault(); showLoading(true); let files = document.getElementById('newsFiles').files; let filePromises = []; for (let i = 0; i < files.length; i++) { filePromises.push(new Promise((resolve) => { let reader = new FileReader(); reader.onload = (e) => resolve({ name: files[i].name, mime: files[i].type, data: e.target.result }); reader.readAsDataURL(files[i]); })); } Promise.all(filePromises).then(fileData => { let payload = { action: 'add_news', date: document.getElementById('newsDate').value, category: document.getElementById('newsCategory').value, title: document.getElementById('newsTitle').value, detail: document.getElementById('newsDetail').value, files: fileData }; fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(res => res.json()).then(data => { showLoading(false); if (data.result === 'success') { alert("✅ บันทึกสำเร็จ!"); document.getElementById('addNewsForm').reset(); loadAllData(); } else { alert("❌ Error: " + data.result); } }); }); });
+        function doLogin() { let user = document.getElementById('loginUser').value; let pass = document.getElementById('loginPass').value; showLoading(true); fetch(SCRIPT_URL + '?action=login&user=' + encodeURIComponent(user) + '&pass=' + encodeURIComponent(pass)).then(res => { if (!res.ok) throw new Error("HTTP error " + res.status); return res.json(); }).then(data => { showLoading(false); if (data.status === 'success') { userRole = data.role; userName = data.name; localStorage.setItem('adminSession', JSON.stringify({ role: userRole, name: userName })); resetIdleTimer(); updateUI(); loginModal.hide(); alert("ยินดีต้อนรับ: " + userName); loadAllData(); } else { alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"); } }).catch(err => { showLoading(false); alert("เกิดข้อผิดพลาด: " + err.message); }); }
+
+        initIdleSystem();
+        checkSession();
+        loadAllData();
+    </script>
+</body>
+</html>
